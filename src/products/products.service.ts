@@ -6,22 +6,52 @@ import { prisma } from 'lib/prisma';
 @Injectable()
 export class ProductsService {
   async create(createProductDto: CreateProductDto) {
-    return await prisma.product.create({data: createProductDto});
+    return await prisma.product.create({ data: createProductDto });
   }
 
-  findAll() {
-    return `This action returns all products`;
+  async findAll(page: number, limit: number) {
+    const [data, total] = await prisma.$transaction([
+      prisma.product.findMany({
+        where: { active: true },
+        skip: page - 1,
+        take: limit,
+      }),
+      prisma.product.count({
+        where: {
+          active: true,
+        },
+      }),
+    ]);
+    return {
+      data: data,
+      totalRecords: total,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} product`;
+    return prisma.product.findFirst({ where: { id: id } });
   }
 
   update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+    try {
+      return prisma.product.update({
+        where: {
+          id,
+        },
+        data: updateProductDto,
+      });
+    } catch (error) {
+      console.log(`error: `, error);
+    }
   }
 
   remove(id: number) {
-    return `This action removes a #${id} product`;
+    return prisma.product.update({
+      where: { id },
+      data: {
+        active: false,
+      },
+    });
   }
 }
