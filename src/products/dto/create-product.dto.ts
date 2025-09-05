@@ -17,4 +17,7 @@ export class CreateProductDto {
 
   @IsNumber()
   supplierId: number;
+
+  @IsNumber()
+  categoryId: number;
 }

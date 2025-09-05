@@ -6,12 +6,12 @@
 
 generator client {
   provider = "prisma-client-js"
-//  output   = "../generated/prisma"
+  //  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DIRECT_URL")
 }
 
 model Product {
@@ -26,6 +26,16 @@ model Product {
   OrderItem     OrderItem[]
   Supplier      Supplier    @relation(fields: [supplierId], references: [id])
   supplierId    Int
+  Category      Category    @relation(fields: [categoryId], references: [id])
+  categoryId    Int
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  active      Boolean
+  name        String
+  description String
+  Product     Product[]
 }
 
 model Customer {
