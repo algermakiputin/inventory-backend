@@ -17,7 +17,7 @@ export class CategoriesService {
       }),
       prisma.category.count({
         where: {
-          active: true,
+          isActive: true,
         },
       }),
     ]);
@@ -51,7 +51,7 @@ export class CategoriesService {
         id,
       },
       data: {
-        active: false,
+        isActive: false,
       },
     });
   }

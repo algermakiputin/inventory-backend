@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ParseIntPipe, Query } from '@nestjs/common';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
 import { prisma } from 'lib/prisma';
@@ -9,8 +9,25 @@ export class SuppliersService {
     return prisma.supplier.create({ data: createSupplierDto });
   }
 
-  findAll() {
-    return `This action returns all suppliers`;
+  async findAll(
+    @Query('page', ParseIntPipe) page,
+    @Query('limit', ParseIntPipe) limit,
+  ) {
+    const [data, total] = await prisma.$transaction([
+      prisma.supplier.findMany({
+        where: {
+          isActive: true,
+        },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.supplier.count({ where: { isActive: true } }),
+    ]);
+    return {
+      data,
+      totalRecords: total,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   findOne(id: number) {
@@ -18,10 +35,15 @@ export class SuppliersService {
   }
 
   update(id: number, updateSupplierDto: UpdateSupplierDto) {
-    return `This action updates a #${id} supplier`;
+    return prisma.supplier.update({
+      where: {
+        id,
+      },
+      data: updateSupplierDto,
+    });
   }
 
   remove(id: number) {
-    return `This action removes a #${id} supplier`;
+    return prisma.supplier.update({ where: { id }, data: { isActive: false } });
   }
 }

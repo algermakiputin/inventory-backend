@@ -16,7 +16,7 @@ datasource db {
 
 model Product {
   id            Int         @id @default(autoincrement())
-  active        Boolean
+  isActive      Boolean
   name          String
   description   String
   price         Float
@@ -32,7 +32,7 @@ model Product {
 
 model Category {
   id          Int       @id @default(autoincrement())
-  active      Boolean
+  isActive    Boolean
   name        String
   description String
   Product     Product[]
@@ -40,7 +40,7 @@ model Category {
 
 model Customer {
   id        Int      @id @default(autoincrement())
-  active    Boolean
+  isActive  Boolean
   name      String
   email     String
   createdAt DateTime @default(now())
@@ -64,8 +64,9 @@ model OrderItem {
 }
 
 model Supplier {
-  id      Int       @id @default(autoincrement())
-  name    String
-  email   String
-  Product Product[]
+  id       Int       @id @default(autoincrement())
+  name     String
+  email    String
+  isActive Boolean
+  Product  Product[]
 }

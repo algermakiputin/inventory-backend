@@ -12,13 +12,13 @@ export class ProductsService {
   async findAll(page: number, limit: number) {
     const [data, total] = await prisma.$transaction([
       prisma.product.findMany({
-        where: { active: true },
+        where: { isActive: true },
         skip: page - 1,
         take: limit,
       }),
       prisma.product.count({
         where: {
-          active: true,
+          isActive: true,
         },
       }),
     ]);
@@ -50,7 +50,7 @@ export class ProductsService {
     return prisma.product.update({
       where: { id },
       data: {
-        active: false,
+        isActive: false,
       },
     });
   }

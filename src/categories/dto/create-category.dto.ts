@@ -8,5 +8,5 @@ export class CreateCategoryDto {
   description: string;
 
   @IsBoolean()
-  active: boolean;
+  isActive: boolean;
 }
