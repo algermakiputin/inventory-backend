@@ -47,20 +47,23 @@ model Customer {
 }
 
 model Order {
-  id        Int         @id @default(autoincrement())
-  name      String
-  createdAt DateTime    @default(now())
-  OrderItem OrderItem[]
+  id         Int         @id @default(autoincrement())
+  status     String?     @default("paid") // pending, paid, cancelled, for future features
+  customerId Int? // record customer id?
+  total      Float
+  createdAt  DateTime    @default(now())
+  OrderItem  OrderItem[]
 }
 
 model OrderItem {
-  id        Int     @id @default(autoincrement())
-  order     Order   @relation(fields: [orderId], references: [id])
-  orderId   Int
-  product   Product @relation(fields: [productId], references: [id])
-  productId Int
-  quantity  Int
-  unitPrice Float
+  id         Int     @id @default(autoincrement())
+  order      Order   @relation(fields: [orderId], references: [id])
+  orderId    Int
+  product    Product @relation(fields: [productId], references: [id])
+  productId  Int
+  quantity   Int
+  unitPrice  Float // price at the time of order
+  totalPrice Float // unitPrice * Quantity
 }
 
 model Supplier {
