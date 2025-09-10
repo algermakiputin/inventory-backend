@@ -2,6 +2,7 @@ import { Injectable, ParseIntPipe, Query } from '@nestjs/common';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
 import { prisma } from 'lib/prisma';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class SuppliersService {
@@ -12,19 +13,24 @@ export class SuppliersService {
   async findAll(
     @Query('page', ParseIntPipe) page,
     @Query('limit', ParseIntPipe) limit,
+    @Query('search') search = '',
   ) {
+    const or: Prisma.SupplierWhereInput = {
+      OR: [{ name: { contains: search, mode: 'insensitive' } }],
+    };
     const [data, total] = await prisma.$transaction([
       prisma.supplier.findMany({
         where: {
           isActive: true,
+          OR: or.OR,
         },
         skip: (page - 1) * limit,
         take: limit,
       }),
-      prisma.supplier.count({ where: { isActive: true } }),
+      prisma.supplier.count({ where: { isActive: true, OR: or.OR } }),
     ]);
     return {
-      data,
+      records: data,
       totalRecords: total,
       totalPages: Math.ceil(total / limit),
     };

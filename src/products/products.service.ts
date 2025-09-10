@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { prisma } from 'lib/prisma';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ProductsService {
@@ -9,16 +10,43 @@ export class ProductsService {
     return await prisma.product.create({ data: createProductDto });
   }
 
-  async findAll(page: number, limit: number) {
+  async findAll(page: number = 1, limit: number = 10, search?: string) {
+    const or: Prisma.ProductWhereInput = {
+      OR: [
+        {
+          name: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+      ],
+    };
     const [data, total] = await prisma.$transaction([
       prisma.product.findMany({
-        where: { isActive: true },
-        skip: page - 1,
+        where: { isActive: true, OR: or.OR },
+        skip: (page - 1) * limit,
         take: limit,
+        select: {
+          name: true,
+          description: true,
+          price: true,
+          stockQuantity: true,
+          id: true,
+          Supplier: {
+            select: { name: true },
+          },
+          Category: {
+            select: { name: true },
+          },
+        },
+        orderBy: {
+          id: 'desc',
+        },
       }),
       prisma.product.count({
         where: {
           isActive: true,
+          OR: or.OR,
         },
       }),
     ]);

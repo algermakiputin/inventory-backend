@@ -26,8 +26,9 @@ export class ProductsController {
   findAll(
     @Query('page', ParseIntPipe) page,
     @Query('limit', ParseIntPipe) limit,
+    @Query('search') search = '',
   ) {
-    return this.productsService.findAll(page, limit);
+    return this.productsService.findAll(page, limit, search);
   }
 
   @Get(':id')

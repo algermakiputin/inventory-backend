@@ -6,6 +6,8 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { SuppliersService } from './suppliers.service';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
@@ -21,8 +23,11 @@ export class SuppliersController {
   }
 
   @Get()
-  findAll() {
-    return this.suppliersService.findAll();
+  findAll(
+    @Query('page', ParseIntPipe) page,
+    @Query('limit', ParseIntPipe) limit,
+  ) {
+    return this.suppliersService.findAll(page, limit);
   }
 
   @Get(':id')

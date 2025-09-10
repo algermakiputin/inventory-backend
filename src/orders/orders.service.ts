@@ -3,18 +3,14 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { prisma } from 'lib/prisma';
 import { OrderItemService } from 'src/order-item/order-item.service';
-import { CreateOrderItemDto } from 'src/order-item/dto/create-order-item.dto';
 
 @Injectable()
 export class OrdersService {
   constructor(private orderItemService: OrderItemService) {}
-  create(
-    createOrderDto: CreateOrderDto,
-    createOrderItemDto: CreateOrderItemDto[],
-  ) {
+  create(createOrderDto: CreateOrderDto) {
     return prisma.$transaction([
       prisma.order.create({ data: createOrderDto }),
-      this.orderItemService.create(createOrderItemDto),
+      this.orderItemService.create(createOrderDto.orderItem),
     ]);
   }
 
