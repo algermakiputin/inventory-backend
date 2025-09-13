@@ -12,6 +12,7 @@ import {
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { FindAllProductsDto } from './dto/findAll-products.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -23,12 +24,9 @@ export class ProductsController {
   }
 
   @Get()
-  findAll(
-    @Query('page', ParseIntPipe) page,
-    @Query('limit', ParseIntPipe) limit,
-    @Query('search') search = '',
-  ) {
-    return this.productsService.findAll(page, limit, search);
+  findAll(@Query() query: FindAllProductsDto) {
+    const { page, limit, search, categoryId } = query;
+    return this.productsService.findAll(page, limit, search, categoryId);
   }
 
   @Get(':id')

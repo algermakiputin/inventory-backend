@@ -81,4 +81,22 @@ export class CategoriesService {
       },
     });
   }
+
+  async findAllWithItemsCount() {
+    const [data, productCount] = await prisma.$transaction([
+      prisma.category.findMany({
+        where: { isActive: true },
+        include: {
+          _count: {
+            select: { Product: { where: { isActive: true } } },
+          },
+        },
+      }),
+      prisma.product.count({ where: { isActive: true } }),
+    ]);
+    return {
+      records: data,
+      productCount,
+    };
+  }
 }

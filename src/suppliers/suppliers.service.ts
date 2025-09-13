@@ -7,7 +7,9 @@ import { Prisma } from '@prisma/client';
 @Injectable()
 export class SuppliersService {
   create(createSupplierDto: CreateSupplierDto) {
-    return prisma.supplier.create({ data: createSupplierDto });
+    return prisma.supplier.create({
+      data: { ...createSupplierDto, isActive: true },
+    });
   }
 
   async findAll(
@@ -26,6 +28,7 @@ export class SuppliersService {
         },
         skip: (page - 1) * limit,
         take: limit,
+        orderBy: { id: 'desc' },
       }),
       prisma.supplier.count({ where: { isActive: true, OR: or.OR } }),
     ]);

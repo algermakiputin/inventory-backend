@@ -8,10 +8,12 @@ import {
   Delete,
   Query,
   ParseIntPipe,
+  ParseBoolPipe,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { GetCategoriesDto } from './dto/get-category.dto';
 
 @Controller('categories')
 export class CategoriesController {
@@ -23,11 +25,16 @@ export class CategoriesController {
   }
 
   @Get()
-  findAll(
-    @Query('page', ParseIntPipe) page,
-    @Query('limit', ParseIntPipe) limit,
-    @Query('search') search = '',
-  ) {
+  findAll(@Query() query: GetCategoriesDto) {
+    const {
+      page = 1,
+      limit = 10,
+      search = '',
+      withProductCount = false,
+    } = query;
+    if (withProductCount === true) {
+      return this.categoriesService.findAllWithItemsCount();
+    }
     return this.categoriesService.findAll(page, limit, search);
   }
 

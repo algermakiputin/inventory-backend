@@ -10,11 +10,20 @@ export class ProductsService {
     return await prisma.product.create({ data: createProductDto });
   }
 
-  async findAll(page: number = 1, limit: number = 10, search?: string) {
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+    search?: string,
+    categoryId?: number,
+  ) {
     const or: Prisma.ProductWhereInput = {
       OR: [
         {
           name: {
+            contains: search,
+            mode: 'insensitive',
+          },
+          description: {
             contains: search,
             mode: 'insensitive',
           },
@@ -23,7 +32,14 @@ export class ProductsService {
     };
     const [data, total] = await prisma.$transaction([
       prisma.product.findMany({
-        where: { isActive: true, OR: or.OR },
+        where: {
+          isActive: true,
+          name: {
+            contains: search,
+            mode: 'insensitive',
+          },
+          ...(categoryId && { categoryId: categoryId }),
+        },
         skip: (page - 1) * limit,
         take: limit,
         select: {
@@ -46,7 +62,11 @@ export class ProductsService {
       prisma.product.count({
         where: {
           isActive: true,
-          OR: or.OR,
+          name: {
+            contains: search,
+            mode: 'insensitive',
+          },
+          ...(categoryId && { categoryId: categoryId }),
         },
       }),
     ]);
