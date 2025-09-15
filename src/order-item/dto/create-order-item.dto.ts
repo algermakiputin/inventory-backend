@@ -1,6 +1,7 @@
-import { IsNumber } from 'class-validator';
+import { IsNumber, IsOptional } from 'class-validator';
 
 export class CreateOrderItemDto {
+  @IsOptional()
   @IsNumber()
   orderId: number;
   @IsNumber()

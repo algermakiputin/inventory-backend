@@ -47,14 +47,15 @@ model Customer {
 }
 
 model Order {
-  id          Int         @id @default(autoincrement())
-  status      String?     @default("paid") // pending, paid, cancelled, for future features
-  customerId  Int? // record customer id?
-  totalAmount Float
-  subTotal    Float
-  discount    Float
-  createdAt   DateTime    @default(now())
-  OrderItem   OrderItem[]
+  id                Int         @id @default(autoincrement())
+  transactionNumber String      @unique
+  status            String?     @default("paid") // pending, paid, cancelled, for future features
+  customerId        Int? // record customer id?
+  totalAmount       Float
+  subTotal          Float
+  discount          Float
+  createdAt         DateTime    @default(now())
+  OrderItem         OrderItem[]
 }
 
 model OrderItem {
@@ -74,4 +75,18 @@ model Supplier {
   email    String
   isActive Boolean
   Product  Product[]
+}
+
+enum UserRole {
+  Admin
+  Manager
+  Cashier
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  name     String
+  password String
+  role     UserRole @default(Admin)
 }
