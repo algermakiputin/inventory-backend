@@ -2,12 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { prisma } from 'lib/prisma';
-import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ProductsService {
   async create(createProductDto: CreateProductDto) {
-    return await prisma.product.create({ data: createProductDto });
+    return await prisma.product.create({
+      data: {
+        ...createProductDto,
+        stockQuantity: 0,
+      },
+    });
   }
 
   async findAll(
@@ -16,20 +20,6 @@ export class ProductsService {
     search?: string,
     categoryId?: number,
   ) {
-    const or: Prisma.ProductWhereInput = {
-      OR: [
-        {
-          name: {
-            contains: search,
-            mode: 'insensitive',
-          },
-          description: {
-            contains: search,
-            mode: 'insensitive',
-          },
-        },
-      ],
-    };
     const [data, total] = await prisma.$transaction([
       prisma.product.findMany({
         where: {

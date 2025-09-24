@@ -17,12 +17,10 @@ export class OrdersService {
           discount: createOrderDto.discount,
         },
       });
-
       const orderItems = createOrderDto.orderItem.map((item) => ({
         ...item,
         orderId: order.id, // 👈 link items to the order
       }));
-      console.log(`orderItems: `, orderItems);
       // 2. create order items with orderId from the created order
       await transaction.orderItem.createMany({
         data: orderItems,
@@ -32,12 +30,39 @@ export class OrdersService {
     });
   }
 
-  findAll() {
-    return prisma.order.findMany();
+  async findAll(page: number = 1, limit: number = 10) {
+    const [orders, totalRecords] = await prisma.$transaction([
+      prisma.order.findMany({
+        skip: page - 1,
+        take: limit,
+        orderBy: {
+          id: 'desc',
+        },
+      }),
+      prisma.order.count(),
+    ]);
+    return {
+      records: orders,
+      totalRecords,
+    };
   }
 
-  findOne(id: number) {
-    return prisma.order.findFirst({ where: { id } });
+  async findOne(id: number) {
+    const [order, orderItems] = await prisma.$transaction([
+      prisma.order.findFirst({ where: { id } }),
+      prisma.orderItem.findMany({
+        where: {
+          orderId: id,
+        },
+        include: {
+          product: true,
+        },
+      }),
+    ]);
+    return {
+      order,
+      orderItems,
+    };
   }
 
   update(id: number, updateOrderDto: UpdateOrderDto) {
