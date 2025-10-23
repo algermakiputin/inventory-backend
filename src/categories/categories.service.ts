@@ -7,7 +7,7 @@ import { Prisma } from '@prisma/client';
 export class CategoriesService {
   create(createCategoryDto: CreateCategoryDto) {
     return prisma.category.create({
-      data: { ...createCategoryDto, isActive: true },
+      data: { ...createCategoryDto, isDeleted: false },
     });
   }
 
@@ -36,13 +36,13 @@ export class CategoriesService {
           id: 'desc',
         },
         where: {
-          isActive: true,
+          isDeleted: false,
           OR: or.OR,
         },
       }),
       prisma.category.count({
         where: {
-          isActive: true,
+          isDeleted: false,
           OR: or.OR,
         },
       }),
@@ -77,7 +77,7 @@ export class CategoriesService {
         id,
       },
       data: {
-        isActive: false,
+        isDeleted: true,
       },
     });
   }
@@ -85,14 +85,14 @@ export class CategoriesService {
   async findAllWithItemsCount() {
     const [data, productCount] = await prisma.$transaction([
       prisma.category.findMany({
-        where: { isActive: true },
+        where: { isDeleted: false },
         include: {
           _count: {
-            select: { Product: { where: { isActive: true } } },
+            select: { Product: { where: { isDeleted: false } } },
           },
         },
       }),
-      prisma.product.count({ where: { isActive: true } }),
+      prisma.product.count({ where: { isDeleted: false } }),
     ]);
     return {
       records: data,

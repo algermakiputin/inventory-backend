@@ -3,7 +3,8 @@ import { IsString, IsBoolean, IsNumber, IsOptional } from 'class-validator';
 export class CreateProductDto {
   @Type(() => Boolean)
   @IsBoolean()
-  isActive: boolean;
+  @IsOptional()
+  isDeleted: boolean;
 
   @Type(() => String)
   @IsString()

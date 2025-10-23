@@ -8,7 +8,7 @@ import { Prisma } from '@prisma/client';
 export class SuppliersService {
   create(createSupplierDto: CreateSupplierDto) {
     return prisma.supplier.create({
-      data: { ...createSupplierDto, isActive: true },
+      data: { ...createSupplierDto, isDeleted: false },
     });
   }
 
@@ -23,14 +23,14 @@ export class SuppliersService {
     const [data, total] = await prisma.$transaction([
       prisma.supplier.findMany({
         where: {
-          isActive: true,
+          isDeleted: false,
           OR: or.OR,
         },
         skip: (page - 1) * limit,
         take: limit,
         orderBy: { id: 'desc' },
       }),
-      prisma.supplier.count({ where: { isActive: true, OR: or.OR } }),
+      prisma.supplier.count({ where: { isDeleted: false, OR: or.OR } }),
     ]);
     return {
       records: data,
@@ -53,6 +53,6 @@ export class SuppliersService {
   }
 
   remove(id: number) {
-    return prisma.supplier.update({ where: { id }, data: { isActive: false } });
+    return prisma.supplier.update({ where: { id }, data: { isDeleted: true } });
   }
 }

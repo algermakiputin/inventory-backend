@@ -16,7 +16,7 @@ datasource db {
 
 model Product {
   id            Int         @id @default(autoincrement())
-  isActive      Boolean
+  isDeleted     Boolean     @default(false)
   name          String
   description   String
   price         Float
@@ -32,7 +32,7 @@ model Product {
 
 model Category {
   id          Int       @id @default(autoincrement())
-  isActive    Boolean
+  isDeleted   Boolean   @default(false)
   name        String
   description String
   Product     Product[]
@@ -40,7 +40,7 @@ model Category {
 
 model Customer {
   id        Int      @id @default(autoincrement())
-  isActive  Boolean
+  isDeleted Boolean  @default(false)
   name      String
   email     String
   createdAt DateTime @default(now())
@@ -70,11 +70,11 @@ model OrderItem {
 }
 
 model Supplier {
-  id       Int       @id @default(autoincrement())
-  name     String
-  email    String
-  isActive Boolean
-  Product  Product[]
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String
+  isDeleted Boolean   @default(false)
+  Product   Product[]
 }
 
 enum UserRole {
@@ -84,9 +84,10 @@ enum UserRole {
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
-  email    String   @unique
-  name     String
-  password String
-  role     UserRole @default(Admin)
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  password  String
+  role      UserRole @default(Admin)
+  isDeleted Boolean  @default(false)
 }

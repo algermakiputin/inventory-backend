@@ -23,11 +23,13 @@ export class ProductsService {
     const [data, total] = await prisma.$transaction([
       prisma.product.findMany({
         where: {
-          isActive: true,
-          name: {
-            contains: search,
-            mode: 'insensitive',
-          },
+          isDeleted: false,
+          ...(search && {
+            name: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          }),
           ...(categoryId && { categoryId: categoryId }),
         },
         skip: (page - 1) * limit,
@@ -51,7 +53,7 @@ export class ProductsService {
       }),
       prisma.product.count({
         where: {
-          isActive: true,
+          isDeleted: false,
           name: {
             contains: search,
             mode: 'insensitive',
@@ -72,6 +74,7 @@ export class ProductsService {
   }
 
   update(id: number, updateProductDto: UpdateProductDto) {
+    console.log(`id:`, id);
     try {
       return prisma.product.update({
         where: {
@@ -88,7 +91,7 @@ export class ProductsService {
     return prisma.product.update({
       where: { id },
       data: {
-        isActive: false,
+        isDeleted: true,
       },
     });
   }

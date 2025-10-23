@@ -8,5 +8,5 @@ export class CreateSupplierDto {
   @IsString()
   @Type(() => String)
   email: string;
-  isActive: boolean;
+  isDeleted: boolean;
 }

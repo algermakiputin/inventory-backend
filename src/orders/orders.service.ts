@@ -7,7 +7,8 @@ import { OrderItemService } from 'src/order-item/order-item.service';
 @Injectable()
 export class OrdersService {
   constructor(private orderItemService: OrderItemService) {}
-  create(createOrderDto: CreateOrderDto) {
+  async create(createOrderDto: CreateOrderDto) {
+    const transactionNumber = await this.generateTransactionNumber();
     return prisma.$transaction(async (transaction) => {
       const order = await transaction.order.create({
         data: {
@@ -15,6 +16,7 @@ export class OrdersService {
           totalAmount: createOrderDto.totalAmount,
           subTotal: createOrderDto.subTotal,
           discount: createOrderDto.discount,
+          transactionNumber,
         },
       });
       const orderItems = createOrderDto.orderItem.map((item) => ({
@@ -28,6 +30,24 @@ export class OrdersService {
 
       return order;
     });
+  }
+
+  async generateTransactionNumber() {
+    const today = new Date();
+    const datePart = today.toISOString().slice(0, 10).replace(/-/g, '');
+
+    const count = await prisma.order.count({
+      where: {
+        createdAt: {
+          gte: new Date(today.setHours(0, 0, 0, 0)),
+          lt: new Date(today.setHours(23, 59, 59, 999)),
+        },
+      },
+    });
+
+    // Increment count + pad with leading zeros
+    const sequence = String(count + 1).padStart(5, '0');
+    return `TXN-${datePart}-${sequence}`;
   }
 
   async findAll(page: number = 1, limit: number = 10) {
